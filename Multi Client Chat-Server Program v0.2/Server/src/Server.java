@@ -39,14 +39,22 @@ public class Server {
 
     static class ClientHandler extends Thread {
         private static Socket client;
-        private static String username;
-        private static BufferedReader clientInput;
-        private static PrintWriter clientOutput;
 
         public ClientHandler(Socket client) {
             System.out.println("New client connected at " + client.getInetAddress());
             LogHandler("New client connected at " + client.getInetAddress());
             this.client = client;
+
+
+        }
+
+        @Override
+        public void run() {
+            Socket client = this.client;
+            BufferedReader clientInput = null;
+            PrintWriter clientOutput = null;
+            String username = "";
+            Boolean continueThread = true;
 
             try {
                 clientInput = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -56,11 +64,7 @@ public class Server {
             } catch(IOException e) {
                 LogHandler("Error connecting to client input/output stream. " + e.getMessage());
             }
-        }
 
-        @Override
-        public void run() {
-            Boolean continueThread = true;
             try {
                 String sPassword = clientInput.readLine();
                 username = clientInput.readLine();
@@ -91,15 +95,7 @@ public class Server {
                         }
                     }
                 } catch(IOException e) {
-                    LogHandler("Error communicating with client. " + e.getMessage());
-                    continueThread = false;
-                    usernames.remove(username);
-                    clientConnections.remove(clientOutput);
-                    try {
-                        clientInput.close();
-                        clientOutput.close();
-                        client.close();
-                    } catch(Exception f) {}
+
                 }
             }
         }
