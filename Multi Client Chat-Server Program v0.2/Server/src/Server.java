@@ -38,7 +38,7 @@ public class Server {
     }
 
     static class ClientHandler extends Thread {
-        private static Socket client;
+        private Socket client;
 
         public ClientHandler(Socket client) {
             System.out.println("New client connected at " + client.getInetAddress());
@@ -95,7 +95,14 @@ public class Server {
                         }
                     }
                 } catch(IOException e) {
-
+                    continueThread = false;
+                    usernames.remove(username);
+                    clientConnections.remove(clientOutput);
+                    try {
+                        clientInput.close();
+                        clientOutput.close();
+                        client.close();
+                    } catch(Exception f) {}
                 }
             }
         }
